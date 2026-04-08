@@ -1,0 +1,180 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct Process {
+    int pid, at, bt, ct, tat, wt;
+    bool done = false;
+};
+
+/* ================= FCFS ================= */
+void fcfs(vector<Process> p) {
+    int n = p.size();
+
+    sort(p.begin(), p.end(), [](Process a, Process b) {
+        return a.at < b.at;
+    });
+
+    int time = 0;
+
+    cout << "\nGantt Chart:\n0 ";
+
+    for (int i = 0; i < n; i++) {
+        if (time < p[i].at) {
+            cout << "Idle " << p[i].at << " ";
+            time = p[i].at;
+        }
+
+        p[i].ct = time + p[i].bt;
+        p[i].tat = p[i].ct - p[i].at;
+        p[i].wt = p[i].tat - p[i].bt;
+
+        cout << "P" << p[i].pid << " " << p[i].ct << " ";
+
+        time = p[i].ct;
+    }
+
+    cout << "\n\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+    for (auto &x : p) {
+        cout << "P" << x.pid << "\t"
+             << x.at << "\t"
+             << x.bt << "\t"
+             << x.ct << "\t"
+             << x.tat << "\t"
+             << x.wt << "\n";
+    }
+}
+
+/* ================= SJF (Non-preemptive) ================= */
+void sjf(vector<Process> p) {
+    int n = p.size();
+    int time = 0, completed = 0;
+
+    cout << "\nGantt Chart:\n0 ";
+
+    while (completed < n) {
+        int idx = -1, mn = 1e9;
+
+        for (int i = 0; i < n; i++) {
+            if (!p[i].done && p[i].at <= time) {
+                if (p[i].bt < mn) {
+                    mn = p[i].bt;
+                    idx = i;
+                }
+            }
+        }
+
+        if (idx == -1) {
+            time++;
+            continue;
+        }
+
+        p[idx].ct = time + p[idx].bt;
+        p[idx].tat = p[idx].ct - p[idx].at;
+        p[idx].wt = p[idx].tat - p[idx].bt;
+        p[idx].done = true;
+
+        cout << "P" << p[idx].pid << " " << p[idx].ct << " ";
+
+        time = p[idx].ct;
+        completed++;
+    }
+
+    cout << "\n\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+    for (auto &x : p) {
+        cout << "P" << x.pid << "\t"
+             << x.at << "\t"
+             << x.bt << "\t"
+             << x.ct << "\t"
+             << x.tat << "\t"
+             << x.wt << "\n";
+    }
+}
+
+/* ================= Round Robin ================= */
+void roundRobin(vector<Process> p, int q) {
+    int n = p.size();
+    vector<int> rem(n);
+
+    for (int i = 0; i < n; i++)
+        rem[i] = p[i].bt;
+
+    int time = 0, done = 0;
+
+    cout << "\nGantt Chart:\n0 ";
+
+    while (done < n) {
+        bool found = false;
+
+        for (int i = 0; i < n; i++) {
+            if (rem[i] > 0 && p[i].at <= time) {
+                found = true;
+
+                if (rem[i] > q) {
+                    time += q;
+                    rem[i] -= q;
+                } else {
+                    time += rem[i];
+                    rem[i] = 0;
+
+                    p[i].ct = time;
+                    p[i].tat = p[i].ct - p[i].at;
+                    p[i].wt = p[i].tat - p[i].bt;
+
+                    done++;
+                }
+
+                cout << "P" << p[i].pid << " " << time << " ";
+            }
+        }
+
+        if (!found) time++;
+    }
+
+    cout << "\n\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+    for (auto &x : p) {
+        cout << "P" << x.pid << "\t"
+             << x.at << "\t"
+             << x.bt << "\t"
+             << x.ct << "\t"
+             << x.tat << "\t"
+             << x.wt << "\n";
+    }
+}
+
+/* ================= MAIN MENU ================= */
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    vector<Process> p(n);
+
+    for (int i = 0; i < n; i++) {
+        p[i].pid = i + 1;
+        cout << "Enter AT and BT for P" << p[i].pid << ": ";
+        cin >> p[i].at >> p[i].bt;
+    }
+
+    int choice;
+
+    cout << "\n===== CPU Scheduling Menu =====\n";
+    cout << "1. FCFS\n";
+    cout << "2. SJF (Non-preemptive)\n";
+    cout << "3. Round Robin\n";
+    cout << "Enter choice: ";
+    cin >> choice;
+
+    if (choice == 1) fcfs(p);
+    else if (choice == 2) sjf(p);
+    else if (choice == 3) {
+        int q;
+        cout << "Enter Time Quantum: ";
+        cin >> q;
+        roundRobin(p, q);
+    }
+    else cout << "Invalid Choice!\n";
+
+    return 0;
+}
