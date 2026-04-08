@@ -1,0 +1,76 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct Process {
+    int id, at, bt, ct, tat, wt;
+};
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    vector<Process> p(n);
+
+    // Input
+    for(int i = 0; i < n; i++) {
+        p[i].id = i + 1;
+        cout << "\nProcess " << p[i].id << endl;
+        cout << "Arrival Time: ";
+        cin >> p[i].at;
+        cout << "Burst Time: ";
+        cin >> p[i].bt;
+    }
+
+    // Sort by Arrival Time
+    sort(p.begin(), p.end(), [](Process a, Process b) {
+        return a.at < b.at;
+    });
+
+    int time = 0;
+
+    cout << "\nGantt Chart:\n| ";
+
+    // FCFS Scheduling
+    for(int i = 0; i < n; i++) {
+        if(time < p[i].at) {
+            // CPU Idle
+            cout << "Idle | ";
+            time = p[i].at;
+        }
+
+        p[i].ct = time + p[i].bt;
+        p[i].tat = p[i].ct - p[i].at;
+        p[i].wt = p[i].tat - p[i].bt;
+
+        cout << "P" << p[i].id << " | ";
+        time = p[i].ct;
+    }
+
+    // Time line
+    cout << "\n0 ";
+    time = 0;
+    for(int i = 0; i < n; i++) {
+        if(time < p[i].at) {
+            cout << p[i].at << " ";
+            time = p[i].at;
+        }
+        cout << p[i].ct << " ";
+        time = p[i].ct;
+    }
+
+    // Table Output
+    cout << "\n\nP\tAT\tBT\tCT\tTAT\tWT\n";
+    for(auto x : p) {
+        cout << "P" << x.id << "\t"
+             << x.at << "\t"
+             << x.bt << "\t"
+             << x.ct << "\t"
+             << x.tat << "\t"
+             << x.wt << endl;
+    }
+
+    return 0;
+}
