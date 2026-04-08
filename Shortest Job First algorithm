@@ -1,0 +1,80 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct Process {
+    int pid;
+    int at;   // arrival time
+    int bt;   // burst time
+    int ct;   // completion time
+    int tat;  // turnaround time
+    int wt;   // waiting time
+    bool done = false;
+};
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    vector<Process> p(n);
+
+    // Input
+    for (int i = 0; i < n; i++) {
+        p[i].pid = i + 1;
+        cout << "Enter Arrival Time and Burst Time for P" << p[i].pid << ": ";
+        cin >> p[i].at >> p[i].bt;
+    }
+
+    int time = 0, completed = 0;
+
+    cout << "\nGantt Chart:\n";
+
+    while (completed < n) {
+        int idx = -1;
+        int minBT = 1e9;
+
+        // find shortest job among arrived processes
+        for (int i = 0; i < n; i++) {
+            if (!p[i].done && p[i].at <= time) {
+                if (p[i].bt < minBT) {
+                    minBT = p[i].bt;
+                    idx = i;
+                }
+            }
+        }
+
+        // if no process available
+        if (idx == -1) {
+            time++;
+            continue;
+        }
+
+        // execute process
+        cout << "| P" << p[idx].pid << " ";
+        time += p[idx].bt;
+
+        p[idx].ct = time;
+        p[idx].tat = p[idx].ct - p[idx].at;
+        p[idx].wt = p[idx].tat - p[idx].bt;
+        p[idx].done = true;
+
+        completed++;
+    }
+
+    cout << "|\n\n";
+
+    // Output table
+    cout << "PID\tAT\tBT\tCT\tTAT\tWT\n";
+    for (auto &x : p) {
+        cout << "P" << x.pid << "\t"
+             << x.at << "\t"
+             << x.bt << "\t"
+             << x.ct << "\t"
+             << x.tat << "\t"
+             << x.wt << "\n";
+    }
+
+    return 0;
+}
