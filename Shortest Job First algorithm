@@ -1,15 +1,9 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 using namespace std;
 
 struct Process {
-    int pid;
-    int at;   // arrival time
-    int bt;   // burst time
-    int ct;   // completion time
-    int tat;  // turnaround time
-    int wt;   // waiting time
+    int pid, at, bt, ct, tat, wt;
     bool done = false;
 };
 
@@ -23,19 +17,19 @@ int main() {
     // Input
     for (int i = 0; i < n; i++) {
         p[i].pid = i + 1;
-        cout << "Enter Arrival Time and Burst Time for P" << p[i].pid << ": ";
+        cout << "Enter AT and BT for P" << p[i].pid << ": ";
         cin >> p[i].at >> p[i].bt;
     }
 
     int time = 0, completed = 0;
 
     cout << "\nGantt Chart:\n";
+    cout << time;
 
     while (completed < n) {
-        int idx = -1;
-        int minBT = 1e9;
+        int idx = -1, minBT = 1e9;
 
-        // find shortest job among arrived processes
+        // Select shortest job among available processes
         for (int i = 0; i < n; i++) {
             if (!p[i].done && p[i].at <= time) {
                 if (p[i].bt < minBT) {
@@ -45,28 +39,31 @@ int main() {
             }
         }
 
-        // if no process available
+        // If no process available → CPU idle
         if (idx == -1) {
             time++;
             continue;
         }
 
-        // execute process
-        cout << "| P" << p[idx].pid << " ";
-        time += p[idx].bt;
+        // Execute process
+        cout << " | P" << p[idx].pid;
 
+        time += p[idx].bt;
         p[idx].ct = time;
         p[idx].tat = p[idx].ct - p[idx].at;
         p[idx].wt = p[idx].tat - p[idx].bt;
         p[idx].done = true;
 
+        cout << " | " << time;
+
         completed++;
     }
 
-    cout << "|\n\n";
+    // Output Table
+    cout << "\n\nPID\tAT\tBT\tCT\tTAT\tWT\n";
 
-    // Output table
-    cout << "PID\tAT\tBT\tCT\tTAT\tWT\n";
+    double totalTAT = 0, totalWT = 0;
+
     for (auto &x : p) {
         cout << "P" << x.pid << "\t"
              << x.at << "\t"
@@ -74,7 +71,15 @@ int main() {
              << x.ct << "\t"
              << x.tat << "\t"
              << x.wt << "\n";
+
+        totalTAT += x.tat;
+        totalWT += x.wt;
     }
+
+    // Average times (optional but good for exam)
+    cout << "\nAverage Turnaround Time = " << totalTAT / n;
+    cout << "\nAverage Waiting Time    = " << totalWT / n << "\n";
 
     return 0;
 }
+
