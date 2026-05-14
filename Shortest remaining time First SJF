@@ -106,3 +106,21 @@ int main()
 
     return 0;
 }
+
+
+
+/******* example ****************/
+
+Enter number of processes: 4
+
+Enter Arrival Time for P1: 0
+Enter Burst Time for P1: 8
+
+Enter Arrival Time for P2: 1
+Enter Burst Time for P2: 4
+
+Enter Arrival Time for P3: 2
+Enter Burst Time for P3: 2
+
+Enter Arrival Time for P4: 3
+Enter Burst Time for P4: 1
