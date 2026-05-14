@@ -1,0 +1,111 @@
+#include <iostream>
+#include <vector>
+#include <climits>
+#include <iomanip>
+
+using namespace std;
+
+struct Process
+{
+    int pid, at, bt, pr;
+    int ct, tat, wt;
+    bool completed = false;
+};
+
+int main()
+{
+    int n;
+
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    vector<Process> p(n);
+
+    // Input
+    for (int i = 0; i < n; i++)
+    {
+        p[i].pid = i + 1;
+
+        cout << "\nEnter Arrival Time for P" << i + 1 << ": ";
+        cin >> p[i].at;
+
+        cout << "Enter Burst Time for P" << i + 1 << ": ";
+        cin >> p[i].bt;
+
+        cout << "Enter Priority for P" << i + 1 << ": ";
+        cin >> p[i].pr;
+    }
+
+    int completed = 0;
+    int currentTime = 0;
+
+    // Non-Preemptive Priority Scheduling
+    while (completed < n)
+    {
+        int idx = -1;
+        int highestPriority = INT_MAX;
+
+        // Find highest priority process
+        // Smaller number = Higher priority
+        for (int i = 0; i < n; i++)
+        {
+            if (!p[i].completed &&
+                p[i].at <= currentTime &&
+                p[i].pr < highestPriority)
+            {
+                highestPriority = p[i].pr;
+                idx = i;
+            }
+        }
+
+        // No process available
+        if (idx == -1)
+        {
+            currentTime++;
+            continue;
+        }
+
+        // Execute completely (Non-Preemptive)
+        currentTime += p[idx].bt;
+
+        p[idx].ct = currentTime;
+        p[idx].tat = p[idx].ct - p[idx].at;
+        p[idx].wt = p[idx].tat - p[idx].bt;
+
+        p[idx].completed = true;
+        completed++;
+    }
+
+    // Output
+    cout << "\n-----------------------------------------------------------\n";
+    cout << "PID\tAT\tBT\tPR\tCT\tTAT\tWT\n";
+    cout << "-----------------------------------------------------------\n";
+
+    double avgTAT = 0, avgWT = 0;
+
+    for (auto x : p)
+    {
+        cout << "P" << x.pid << "\t"
+             << x.at << "\t"
+             << x.bt << "\t"
+             << x.pr << "\t"
+             << x.ct << "\t"
+             << x.tat << "\t"
+             << x.wt << endl;
+
+        avgTAT += x.tat;
+        avgWT += x.wt;
+    }
+
+    cout << "-----------------------------------------------------------\n";
+
+    cout << fixed << setprecision(2);
+
+    cout << "\nAverage Turnaround Time = "
+         << avgTAT / n << endl;
+
+    cout << "Average Waiting Time = "
+         << avgWT / n << endl;
+
+    return 0;
+}
