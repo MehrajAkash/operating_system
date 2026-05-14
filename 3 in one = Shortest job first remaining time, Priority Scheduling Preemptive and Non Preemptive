@@ -1,8 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <climits>
-#include <iomanip>
-
+#include<bits/stdc++.h>
 using namespace std;
 
 struct Process
@@ -12,9 +8,9 @@ struct Process
     bool completed = false;
 };
 
-// =======================
-// SJF PREEMPTIVE (SRTF)
-// =======================
+
+
+/// Shortest Job First preemptive
 void sjfPreemptive(vector<Process> p, int n)
 {
     int completed = 0, currentTime = 0;
@@ -26,9 +22,7 @@ void sjfPreemptive(vector<Process> p, int n)
 
         for (int i = 0; i < n; i++)
         {
-            if (p[i].at <= currentTime &&
-                p[i].rt > 0 &&
-                p[i].rt < minRT)
+            if (p[i].at <= currentTime && p[i].rt > 0 && p[i].rt < minRT)
             {
                 minRT = p[i].rt;
                 idx = i;
@@ -54,13 +48,13 @@ void sjfPreemptive(vector<Process> p, int n)
         }
     }
 
-    cout << "\n===== SJF PREEMPTIVE (SRTF) =====\n";
+    cout << "\n   Shortest Job First preemptive   \n";
 
     double avgTAT = 0, avgWT = 0;
 
-    cout << "--------------------------------------------------\n";
+    cout <<endl;
     cout << "PID\tAT\tBT\tCT\tTAT\tWT\n";
-    cout << "--------------------------------------------------\n";
+    cout <<endl;
 
     for (auto x : p)
     {
@@ -75,16 +69,18 @@ void sjfPreemptive(vector<Process> p, int n)
         avgWT += x.wt;
     }
 
-    cout << "--------------------------------------------------\n";
+    cout<<endl;
 
     cout << fixed << setprecision(2);
     cout << "\nAverage Turnaround Time = " << avgTAT / n << endl;
     cout << "Average Waiting Time = " << avgWT / n << endl;
 }
 
-// =======================
-// PRIORITY PREEMPTIVE
-// =======================
+
+
+
+
+/// Priority Scheduling Preemptive
 void priorityPreemptive(vector<Process> p, int n)
 {
     int completed = 0, currentTime = 0;
@@ -96,9 +92,7 @@ void priorityPreemptive(vector<Process> p, int n)
 
         for (int i = 0; i < n; i++)
         {
-            if (p[i].at <= currentTime &&
-                p[i].rt > 0 &&
-                p[i].pr < highestPriority)
+            if (p[i].at <= currentTime && p[i].rt > 0 && p[i].pr < highestPriority)
             {
                 highestPriority = p[i].pr;
                 idx = i;
@@ -124,13 +118,13 @@ void priorityPreemptive(vector<Process> p, int n)
         }
     }
 
-    cout << "\n===== PRIORITY PREEMPTIVE =====\n";
+    cout << "\n ********** Priority Scheduling Preemptive ***********\n";
 
     double avgTAT = 0, avgWT = 0;
 
-    cout << "-----------------------------------------------------------\n";
+    cout << endl;
     cout << "PID\tAT\tBT\tPR\tCT\tTAT\tWT\n";
-    cout << "-----------------------------------------------------------\n";
+    cout << "\n";
 
     for (auto x : p)
     {
@@ -146,30 +140,30 @@ void priorityPreemptive(vector<Process> p, int n)
         avgWT += x.wt;
     }
 
-    cout << "-----------------------------------------------------------\n";
+    cout << "\n";
 
     cout << fixed << setprecision(2);
     cout << "\nAverage Turnaround Time = " << avgTAT / n << endl;
     cout << "Average Waiting Time = " << avgWT / n << endl;
 }
 
-// =======================
-// PRIORITY NON PREEMPTIVE
-// =======================
+
+
+
+/// **** Priority Non Preemptive ***********
+
 void priorityNonPreemptive(vector<Process> p, int n)
 {
     int completed = 0, currentTime = 0;
 
-    while (completed < n)
+    while ( completed < n )
     {
         int idx = -1;
         int highestPriority = INT_MAX;
 
         for (int i = 0; i < n; i++)
         {
-            if (!p[i].completed &&
-                p[i].at <= currentTime &&
-                p[i].pr < highestPriority)
+            if (!p[i].completed && p[i].at <= currentTime && p[i].pr < highestPriority)
             {
                 highestPriority = p[i].pr;
                 idx = i;
@@ -192,13 +186,13 @@ void priorityNonPreemptive(vector<Process> p, int n)
         completed++;
     }
 
-    cout << "\n===== PRIORITY NON PREEMPTIVE =====\n";
+    cout << "\n ********* Priority Non Preemptive************** \n";
 
     double avgTAT = 0, avgWT = 0;
 
-    cout << "-----------------------------------------------------------\n";
+    cout << "\n";
     cout << "PID\tAT\tBT\tPR\tCT\tTAT\tWT\n";
-    cout << "-----------------------------------------------------------\n";
+    cout << "\n";
 
     for (auto x : p)
     {
@@ -214,16 +208,19 @@ void priorityNonPreemptive(vector<Process> p, int n)
         avgWT += x.wt;
     }
 
-    cout << "-----------------------------------------------------------\n";
+    cout << "\n";
 
     cout << fixed << setprecision(2);
     cout << "\nAverage Turnaround Time = " << avgTAT / n << endl;
     cout << "Average Waiting Time = " << avgWT / n << endl;
 }
 
-// =======================
-// MAIN FUNCTION
-// =======================
+
+
+
+
+/// MAIN FUNCTION
+
 int main()
 {
     int n;
@@ -279,3 +276,4 @@ int main()
 
     return 0;
 }
+
