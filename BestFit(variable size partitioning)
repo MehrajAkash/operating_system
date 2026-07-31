@@ -7,10 +7,10 @@ void bestFit(int blockSize[], int m, int processSize[], int n){
 
     for(int i=0; i<n; i++){
         int bestIndex = -1;
-        int blsize = INT_MIN;
+        int blsize = INT_MAX;
 
         for(int j=0;j<m; j++){
-            if( (blockSize[j] >= processSize[i]) && (blockSize[j]>blsize) ){
+            if( (blockSize[j] >= processSize[i]) && (blockSize[j] < blsize) ){
                 bestIndex = j;
                 blsize = blockSize[j];
             }
@@ -30,10 +30,6 @@ void bestFit(int blockSize[], int m, int processSize[], int n){
         }else{
             cout<<allocation[i]+1<<endl;
         }
-    }
-
-    for(int j=0; j<m;j++){
-        cout<<blockSize[j]<<endl;
     }
 }
 
