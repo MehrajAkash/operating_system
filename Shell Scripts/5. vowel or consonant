@@ -1,0 +1,22 @@
+echo "Enter a character:"
+read ch
+
+if [[ "$ch" =~ ^[AEIOUaeiou]$ ]]
+then
+    echo "$ch is a Vowel."
+else
+    echo "$ch is a Consonant."
+fi
+
+********************************************************************
+
+echo "Enter a character:"
+read ch
+
+if [[ "$ch" == "a" || "$ch" == "e" || "$ch" == "i" || "$ch" == "o" || "$ch" == "u" || \
+      "$ch" == "A" || "$ch" == "E" || "$ch" == "I" || "$ch" == "O" || "$ch" == "U" ]]
+then
+    echo "$ch is a Vowel."
+else
+    echo "$ch is a Consonant."
+fi
