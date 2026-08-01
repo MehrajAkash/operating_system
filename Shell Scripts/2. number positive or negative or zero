@@ -1,0 +1,12 @@
+echo "Enter a number:"
+read num
+
+if (( num > 0 ))
+then
+    echo "$num is Positive."
+elif (( num < 0 ))
+then
+    echo "$num is Negative."
+else
+    echo "The number is Zero."
+fi
