@@ -1,0 +1,22 @@
+#!/bin/bash
+
+arr=(25 10 40 5 70 30)
+
+max=${arr[0]}
+min=${arr[0]}
+
+for i in "${arr[@]}"
+do
+    if [ $i -gt $max ]
+    then
+        max=$i
+    fi
+
+    if [ $i -lt $min ]
+    then
+        min=$i
+    fi
+done
+
+echo "Maximum = $max"
+echo "Minimum = $min"
