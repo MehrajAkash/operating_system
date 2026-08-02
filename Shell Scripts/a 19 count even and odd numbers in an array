@@ -1,0 +1,19 @@
+#!/bin/bash
+
+arr=(10 15 20 25 30 35 40)
+
+even=0
+odd=0
+
+for i in "${arr[@]}"
+do
+    if [ $((i % 2)) -eq 0 ]
+    then
+        even=$((even + 1))
+    else
+        odd=$((odd + 1))
+    fi
+done
+
+echo "Even Numbers = $even"
+echo "Odd Numbers = $odd"
