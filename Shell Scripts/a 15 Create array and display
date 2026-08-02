@@ -1,0 +1,8 @@
+arr=(10 20 30 40 50)
+
+echo "Array Elements:"
+
+for i in "${arr[@]}"
+do
+    echo $i
+done
