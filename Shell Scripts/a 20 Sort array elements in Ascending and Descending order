@@ -1,0 +1,32 @@
+#!/bin/bash
+
+arr=(30 10 50 20 40)
+n=${#arr[@]}
+
+# Ascending
+for ((i=0; i<n-1; i++))
+do
+    for ((j=0; j<n-i-1; j++))
+    do
+        if [ ${arr[j]} -gt ${arr[$((j+1))]} ]
+        then
+            temp=${arr[j]}
+            arr[j]=${arr[$((j+1))]}
+            arr[$((j+1))]=$temp
+        fi
+    done
+done
+
+echo "Ascending Order:"
+echo "${arr[@]}"
+
+# Descending
+for ((i=0; i<n/2; i++))
+do
+    temp=${arr[i]}
+    arr[i]=${arr[$((n-i-1))]}
+    arr[$((n-i-1))]=$temp
+done
+
+echo "Descending Order:"
+echo "${arr[@]}"
