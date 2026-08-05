@@ -1,0 +1,56 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+void bestFit(int blockSize[], int m, int processSize[], int n){
+
+    int allocation[n];
+    for(int i=1; i<n; i++)allocation[i]=-1;
+
+    for(int i=0;i<n;i++){
+
+        int bestBlockSize = INT_MAX;
+        int bestIndex=-1;
+
+        for(int j=0; j<m; j++){
+
+            if( (blockSize[j]>=processSize[i]) && (blockSize[j] < bestBlockSize) ){
+
+                bestBlockSize = blockSize[j];
+                bestIndex = j;
+            }
+        }
+
+        if( bestIndex != -1 ){
+            blockSize[bestIndex] -= processSize[i];
+            allocation[i] = bestIndex;
+        }
+    }
+
+
+    cout<<"\n First fit allocation "<<endl;
+    cout<<"ProcessNo. ProcessSize. BlockNo."<<endl;
+
+    for(int i=0; i<n; i++){
+        cout<<"P"<<i+1<<"\t\t"<<processSize[i]<<"\t\t";
+
+        if(allocation[i] != -1){
+            cout<< allocation[i]+1 <<endl;
+        }else{
+            cout<<"Not allocated" <<endl;
+        }
+    }
+
+}
+
+int main()
+{
+    int blockSize[] = { 100, 500, 200, 300, 600 };
+    int processSize[] = { 212, 417, 112, 426 };
+
+    int m=5;
+    int n=4;
+
+    bestFit(blockSize, m, processSize, n);
+
+    return 0;
+}
