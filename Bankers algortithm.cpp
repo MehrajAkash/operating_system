@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-int main() {
+int main(){
     int n, m;
 
     cout << "Enter number of processes: ";
@@ -10,30 +10,31 @@ int main() {
     cout << "Enter number of resource types: ";
     cin >> m;
 
-    int alloc[n][m], maxm[n][m], need[n][m];
-    int avail[m];
+    int allocated[n][m], maxNeed[n][m], remNeed[n][m];
+    int available[m];
 
     // Allocation Matrix
     cout << "\nEnter Allocation Matrix:\n";
     for (int i = 0; i < n; i++)
         for (int j = 0; j < m; j++)
-            cin >> alloc[i][j];
+            cin >> allocated[i][j];
 
     // Maximum Matrix
     cout << "\nEnter Maximum Matrix:\n";
     for (int i = 0; i < n; i++)
         for (int j = 0; j < m; j++)
-            cin >> maxm[i][j];
-
-    // Available Resources
-    cout << "\nEnter Available Resources:\n";
-    for (int i = 0; i < m; i++)
-        cin >> avail[i];
+            cin >> maxNeed[i][j];
 
     // Calculate Need Matrix
     for (int i = 0; i < n; i++)
         for (int j = 0; j < m; j++)
-            need[i][j] = maxm[i][j] - alloc[i][j];
+            remNeed[i][j] = maxNeed[i][j] - allocated[i][j];
+
+    // Available Resources
+    cout << "\nEnter Available Resources:\n";
+    for (int i = 0; i < m; i++)
+        cin >> available[i];
+
 
     bool finish[n] = {false};
     int safeSeq[n];
@@ -41,7 +42,7 @@ int main() {
 
     // Copy available resources to work array
     for (int i = 0; i < m; i++)
-        work[i] = avail[i];
+        work[i] = available[i];
 
     int count = 0;
 
@@ -55,7 +56,7 @@ int main() {
 
                 // Check if all needed resources are available
                 for (int j = 0; j < m; j++) {
-                    if (need[i][j] > work[j]) {
+                    if (remNeed[i][j] > work[j]) {
                         possible = false;
                         break;
                     }
@@ -64,7 +65,7 @@ int main() {
                 if (possible) {
                     // Release allocated resources
                     for (int j = 0; j < m; j++)
-                        work[j] += alloc[i][j];
+                        work[j] += allocated[i][j];
 
                     safeSeq[count++] = i;
                     finish[i] = true;
@@ -84,7 +85,8 @@ int main() {
 
     for (int i = 0; i < n; i++) {
         cout << "P" << safeSeq[i];
-        if (i != n - 1)
+
+        if (i != n-1)
             cout << " -> ";
     }
 
@@ -92,7 +94,6 @@ int main() {
 
     return 0;
 }
-
 
 
 
