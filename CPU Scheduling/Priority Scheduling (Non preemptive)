@@ -1,0 +1,156 @@
+#include <iostream>//cout, cin, end
+#include <vector>//
+#include <algorithm>//sort() এবং min()
+#include <iomanip>//setw()
+
+using namespace std;
+
+struct Process {
+    int pid;
+    int at, bt;
+    int priority;
+    int ct = 0, tat = 0, wt = 0;
+};
+
+// ---------------- GANTT CHART ----------------
+void printGantt(const vector<pair<int,int>>& gantt) {
+    cout << "\nGantt Chart:\n";
+
+    // Upper line
+    cout << "|";
+    for (auto x : gantt) {
+
+        if (x.first == -1)
+           cout << " Idle |";
+
+        else
+           cout << " P" << x.first << " |";
+    }
+
+    cout << "\n";
+
+    // Time line
+    cout << 0;
+    for (auto x : gantt) {
+        cout << setw(5) << x.second;
+    }
+    cout << '\n';
+}
+
+
+// ---------------- RESULT ----------------
+void printResult(vector<Process>& p) {
+    float totalWT = 0, totalTAT = 0;
+
+    cout << "\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+
+    for (auto& x : p) {
+        x.tat = x.ct - x.at;
+        x.wt = x.tat - x.bt;
+
+        totalWT += x.wt;
+        totalTAT += x.tat;
+
+        cout << "P" << x.pid << '\t'
+             << x.at << '\t'
+             << x.bt << '\t'
+             << x.ct << '\t'
+             << x.tat << '\t'
+             << x.wt << '\n';
+    }
+
+    cout << "\nAverage WT = " << totalWT / p.size();
+    cout << "\nAverage TAT = " << totalTAT / p.size() << '\n';
+}
+
+// ---------------- PRIORITY NON-PREEMPTIVE ----------------
+void priorityNonPreemptive(vector<Process> p) {
+    int n = p.size();
+
+    vector<bool> completed(n, false);
+    vector<pair<int,int>> gantt;
+
+    int time = 0;
+    int finished = 0;
+
+    while (finished < n) {
+
+        int idx = -1;
+
+        // Find highest priority process
+        for (int i = 0; i < n; i++) {
+
+            if (!completed[i] && p[i].at <= time) {
+
+                if (idx == -1)
+                    idx = i;
+
+                else if (p[i].priority < p[idx].priority)
+                    idx = i;
+
+                else if (p[i].priority == p[idx].priority &&
+                         p[i].at < p[idx].at)
+                    idx = i;
+            }
+        }
+
+        // CPU Idle
+        if (idx == -1) {
+
+            int nextArrival = 1000000;
+
+            for (int i = 0; i < n; i++) {
+                if (!completed[i])
+                    nextArrival = min(nextArrival, p[i].at);
+            }
+
+            gantt.push_back({-1, nextArrival});
+            time = nextArrival;
+            continue;
+        }
+
+        // Execute Process
+        time += p[idx].bt;
+        p[idx].ct = time;
+
+        completed[idx] = true;
+        finished++;
+
+        gantt.push_back({p[idx].pid, time});
+    }
+
+    printGantt(gantt);
+    printResult(p);
+}
+
+
+// ---------------- MAIN ----------------
+int main() {
+    int n;
+
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    vector<Process> p(n);
+
+    for (int i = 0; i < n; i++) {
+
+        p[i].pid = i + 1;
+
+        cout << "\nProcess P" << i + 1 << '\n';
+
+        cout << "Arrival Time: ";
+        cin >> p[i].at;
+
+        cout << "Burst Time: ";
+        cin >> p[i].bt;
+
+        cout << "Priority: ";
+        cin >> p[i].priority;
+    }
+
+
+    priorityNonPreemptive(p);
+
+    return 0;
+}
