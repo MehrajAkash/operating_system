@@ -1,0 +1,171 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+struct Process {
+    int pid;
+    int at, bt;
+    int ct = 0, tat = 0, wt = 0;
+};
+
+// ---------------- GANTT CHART ----------------
+void printGantt(const vector<int>& gantt) {
+
+    cout << "\nGantt Chart:\n|";
+
+    for (int x : gantt) {
+        if (x == -1)
+            cout << " Idle |";
+        else
+            cout << " P" << x << " |";
+    }
+
+    cout << "\n0";
+
+    for (int i = 1; i <= gantt.size(); i++)
+        cout << setw(5) << i;
+
+    cout << endl;
+}
+
+
+// ---------------- RESULT ----------------
+void printResult(vector<Process>& p) {
+    float totalWT = 0, totalTAT = 0;
+
+    cout << "\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+
+    for (auto& x : p) {
+        x.tat = x.ct - x.at;
+        x.wt = x.tat - x.bt;
+
+        totalWT += x.wt;
+        totalTAT += x.tat;
+
+        cout << "P" << x.pid << '\t'
+             << x.at << '\t'
+             << x.bt << '\t'
+             << x.ct << '\t'
+             << x.tat << '\t'
+             << x.wt << '\n';
+    }
+
+    cout << "\nAverage WT = " << totalWT / p.size();
+    cout << "\nAverage TAT = " << totalTAT / p.size() << '\n';
+}
+
+
+// ---------------- ROUND ROBIN PREEMPTIVE ----------------
+void roundRobin(vector<Process> p, int quantum) {
+
+    int n = p.size();
+
+    vector<int> remainingBT(n);
+    vector<int> gantt;
+
+    queue<int> readyQueue;
+
+    bool visited[n] = {false};
+
+    for (int i = 0; i < n; i++)
+        remainingBT[i] = p[i].bt;
+
+    int time = 0;
+    int completed = 0;
+
+    while (completed < n) {
+
+        // Add arrived processes to ready queue
+        for (int i = 0; i < n; i++) {
+
+            if (p[i].at <= time && !visited[i]) {
+                readyQueue.push(i);
+                visited[i] = true;
+            }
+        }
+
+        // CPU Idle
+        if (readyQueue.empty()) {
+
+            gantt.push_back(-1);
+            time++;
+
+            continue;
+        }
+
+        // Select process
+        int idx = readyQueue.front();
+        readyQueue.pop();
+
+        int executeTime = min(quantum, remainingBT[idx]);
+
+        // Execute one quantum
+        for (int i = 0; i < executeTime; i++) {
+
+            gantt.push_back(p[idx].pid);
+
+            remainingBT[idx]--;
+            time ++;
+
+            // New process arrival during execution
+            for (int j = 0; j < n; j++) {
+
+                if (p[j].at == time && !visited[j]) {
+                    readyQueue.push(j);
+                    visited[j] = true;
+                }
+            }
+
+            if (remainingBT[idx] == 0)
+                break;
+        }
+
+        // Process completed
+        if (remainingBT[idx] == 0) {
+
+            p[idx].ct = time;
+            completed++;
+        }
+
+        // Process not completed, put back in queue
+        else {
+
+            readyQueue.push(idx);
+        }
+    }
+
+    printGantt(gantt);
+    printResult(p);
+}
+
+
+// ---------------- MAIN ----------------
+int main() {
+    int n;
+
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int quantum;
+    cout << "Enter Time Quantum: ";
+    cin >> quantum;
+
+    vector<Process> p(n);
+
+    for (int i = 0; i < n; i++) {
+
+        p[i].pid = i + 1;
+
+        cout << "\nProcess P" << i + 1 << '\n';
+
+        cout << "Arrival Time: ";
+        cin >> p[i].at;
+
+        cout << "Burst Time: ";
+        cin >> p[i].bt;
+    }
+
+
+    roundRobin(p, quantum);
+
+    return 0;
+}
