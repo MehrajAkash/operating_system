@@ -1,0 +1,123 @@
+#include <iostream>//cout, cin, end
+#include <vector>//
+#include <algorithm>//sort() এবং min()
+#include <iomanip>//setw()
+
+using namespace std;
+
+struct Process {
+    int pid;
+    int at, bt;
+    int ct = 0, tat = 0, wt = 0;
+};
+
+// ---------------- GANTT CHART ----------------
+void printGantt(const vector<pair<int,int>>& gantt) {
+    cout << "\nGantt Chart:\n";
+
+    // Upper line
+    cout << "|";
+    for (auto x : gantt) {
+
+        if (x.first == -1)
+           cout << " Idle |";
+
+        else
+           cout << " P" << x.first << " |";
+    }
+
+    cout << "\n";
+
+    // Time line
+    cout << 0;
+    for (auto x : gantt) {
+        cout << setw(5) << x.second;
+    }
+    cout << '\n';
+}
+
+
+// ---------------- RESULT ----------------
+void printResult(vector<Process>& p) {
+    float totalWT = 0, totalTAT = 0;
+
+    cout << "\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+
+    for (auto& x : p) {
+        x.tat = x.ct - x.at;
+        x.wt = x.tat - x.bt;
+
+        totalWT += x.wt;
+        totalTAT += x.tat;
+
+        cout << "P" << x.pid << '\t'
+             << x.at << '\t'
+             << x.bt << '\t'
+             << x.ct << '\t'
+             << x.tat << '\t'
+             << x.wt << '\n';
+    }
+
+    cout << "\nAverage WT = " << totalWT / p.size();
+    cout << "\nAverage TAT = " << totalTAT / p.size() << '\n';
+}
+
+// ---------------- FCFS NON-PREEMPTIVE ----------------
+void fcfsNonPreemptive(vector<Process> p) {
+    sort(p.begin(), p.end(), [](const Process& a, const Process& b) {
+        if (a.at == b.at)
+            return a.pid < b.pid;
+        return a.at < b.at;
+    });
+
+    int time = 0;
+    vector<pair<int,int>> gantt;
+
+    for (auto& x : p) {
+
+        // CPU Idle
+        if (time < x.at) {
+            gantt.push_back({-1, x.at});   // Idle
+            time = x.at;
+        }
+
+        time += x.bt;
+        x.ct = time;
+
+        // Store Process ID and Completion Time
+        gantt.push_back({x.pid, time});
+    }
+
+    printGantt(gantt);
+    printResult(p);
+}
+
+
+// ---------------- MAIN ----------------
+int main() {
+    int n;
+
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    if (n <= 0) {
+        cout << "Number of processes must be positive.\n";
+        return 1;
+    }
+
+    vector<Process> p(n);
+
+    for (int i = 0; i < n; i++) {
+        p[i].pid = i + 1;
+
+        cout << "\nProcess P" << i + 1 << '\n';
+        cout << "Arrival Time: ";
+        cin >> p[i].at;
+        cout << "Burst Time: ";
+        cin >> p[i].bt;
+    }
+
+    fcfsNonPreemptive(p);
+
+    return 0;
+}
