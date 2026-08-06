@@ -1,0 +1,147 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+struct Process {
+    int pid;
+    int at, bt;
+    int ct = 0, tat = 0, wt = 0;
+};
+
+// ---------------- GANTT CHART ----------------
+void printGantt(const vector<int>& gantt) {
+
+    cout << "\nGantt Chart:\n|";
+
+    for (int x : gantt) {
+        if (x == -1)
+            cout << " Idle |";
+        else
+            cout << " P" << x << " |";
+    }
+
+    cout << "\n0";
+
+    for (int i = 1; i <= gantt.size(); i++)
+        cout << setw(5) << i;
+
+    cout << endl;
+}
+
+
+// ---------------- RESULT ----------------
+void printResult(vector<Process>& p) {
+    float totalWT = 0, totalTAT = 0;
+
+    cout << "\nPID\tAT\tBT\tCT\tTAT\tWT\n";
+
+    for (auto& x : p) {
+        x.tat = x.ct - x.at;
+        x.wt = x.tat - x.bt;
+
+        totalWT += x.wt;
+        totalTAT += x.tat;
+
+        cout << "P" << x.pid << '\t'
+             << x.at << '\t'
+             << x.bt << '\t'
+             << x.ct << '\t'
+             << x.tat << '\t'
+             << x.wt << '\n';
+    }
+
+    cout << "\nAverage WT = " << totalWT / p.size();
+    cout << "\nAverage TAT = " << totalTAT / p.size() << '\n';
+}
+
+
+// ---------------- SRTF (PREEMPTIVE SJF) ----------------
+void srtf(vector<Process> p) {
+
+    int n = p.size();
+
+    vector<int> remainingBT(n);
+    vector<int> gantt;
+
+    for (int i = 0; i < n; i++)
+        remainingBT[i] = p[i].bt;
+
+    int time = 0;
+    int completed = 0;
+
+    while (completed < n) {
+
+        int idx = -1;
+        int shortest = 1000000;
+
+        // Find process with shortest remaining time
+        for (int i = 0; i < n; i++) {
+
+            if (p[i].at <= time && remainingBT[i] > 0) {
+
+                if (remainingBT[i] < shortest) {
+                    shortest = remainingBT[i];
+                    idx = i;
+                }
+
+                // Tie breaking: earlier arrival first
+                else if (remainingBT[i] == shortest &&
+                         p[i].at < p[idx].at) {
+                    idx = i;
+                }
+            }
+        }
+
+
+        // CPU Idle
+        if (idx == -1) {
+            gantt.push_back(-1);
+            time++;
+            continue;
+        }
+
+
+        // Execute process for 1 second
+        gantt.push_back(p[idx].pid);
+
+        remainingBT[idx]--;
+        time++;
+
+
+        // Process completed
+        if (remainingBT[idx] == 0) {
+            p[idx].ct = time;
+            completed++;
+        }
+    }
+
+    printGantt(gantt);
+    printResult(p);
+}
+
+
+// ---------------- MAIN ----------------
+int main() {
+    int n;
+
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    vector<Process> p(n);
+
+    for (int i = 0; i < n; i++) {
+
+        p[i].pid = i + 1;
+
+        cout << "\nProcess P" << i + 1 << '\n';
+
+        cout << "Arrival Time: ";
+        cin >> p[i].at;
+
+        cout << "Burst Time: ";
+        cin >> p[i].bt;
+    }
+
+    srtf(p);
+
+    return 0;
+}
